@@ -1,0 +1,179 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html" />
+<link rel="import" href="../t-text-container/travel-element-styles.html">
+<link rel="import" href="../t-notify/t-notify.html">
+<link rel="import" href="../t-sessionstorage/t-sessionstorage.html">
+<link rel="import" href="../t-behavior/t-session-behavior.html"/>
+<link rel="import" href="../t-behavior/t-page-behavior.html">
+<link rel="import" href="../t-list/t-list.html">
+<link rel="import" href="../t-trip-item/t-trip-item.html">
+
+<!--
+    <h3>Details:</h3>
+
+        `t-trips-listing` is a car payment page component which displays payment information.
+
+    <h3>Events:</h3>
+
+        following events are fired by this component
+
+    <h3>Example:</h3>
+
+    @demo demo/index.html
+-->
+
+<dom-module id="t-trips-listing">
+
+    <style include="iron-flex"></style>
+    <style include="travel-element-styles">
+        :host {
+            font-family: var(--header-font-family, --primary-font-family);
+            font-size: var(--font-14, 14px);
+            display: block; 
+        }
+    </style>
+
+    <template>
+
+        <content select="t-header"></content>
+
+        <t-notify id="notify" message="Logged in user not found!" type="warn"></t-notify>
+
+        <t-list
+            id="list"
+            search-icon="[[searchIcon]]"
+            filter-icon="[[filterIcon]]"
+            currency="[[currency]]"
+            filter-api-response="result"
+            with-filter
+            data-call-method="POST"
+            filter-call-method="POST"        
+            filter-response-param="result"
+            as="item"
+            token-param="bookings"
+            skip-count="10"
+            top="10"
+            filter-search-label = "search trips by traveller name"
+            include-filters='["Status","DateRange","Traveller"]'
+            excluded-filters='[{"Status":["Past"]}]'
+            no-results-found-message="You haven't booked anything yet!" 
+            no-results-filtered-message="We could not find any trips for the filters you have applied."
+            no-results-filtered-for-search-term-message="We could not find any traveller's name containing 'SEARCHTERM’."
+            redirect-link-text="Start planning your trip"
+            data-api="[[apiBaseUrl]]api/ShoppingCart/retrieve/orders/[[user.userId]]?token=[[authToken]]"
+            filter-api="[[apiBaseUrl]]api/ShoppingCart/retrieve/orders/filters?token=?token=[[authToken]]"
+            filterResultsApi="[[apiBaseUrl]]api/ShoppingCart/retrieve/orders/[[user.userId]]?token=[[authToken]]">
+            <template>
+                <t-trip-item model="{{item}}"></t-trip-item>
+            </template>
+        </t-list>
+        
+        <t-sessionstorage
+            id="sessionStore"
+            api-url-format="[[apiUrlFormat]]"
+            on-t-sessionstorage-load-success="_onSessionGet"
+            on-t-sessionstorage-save-success="_onSessionSave">
+        </t-sessionstorage>
+    </template>
+
+    <script>
+
+        (function () {
+
+            'use strict'
+
+            Polymer({
+
+                is: 't-trips-listing',
+
+                behaviors: [
+                    TravelNxt.Behaviors.PageBehavior,
+                    TravelNxt.Behaviors.SessionBehavior
+                ],
+
+                properties: {                    
+                    user: {
+                        type: Object
+                    },
+
+                    searchIcon: {
+                        type: String
+                    },
+
+                    filterIcon: {
+                        type: String
+                    },
+
+                    desktopSiteBaseUrl: {
+                        type: String
+                    }
+                },
+
+                observers:[
+                    '__pageLoad(visible)'
+                ],
+                
+                listeners: {
+                    'session-get-complete': '_updatePage',
+                    'detail-click' : '_goToDetailsPage'
+                },
+
+                /*
+                 * observer function for page `authToken`, `passengerInfo` properties
+                */
+                __pageLoad: function (visible) {
+
+                    if (!visible){
+                        return;
+                    }
+
+                    this.$.notify.active = false;
+
+                    this._syncSession();
+                },
+
+                /*
+                 * <p>this method gets called when page becomes visible</p>
+                 * <p>`go-to-search` event is fired if `bookedItinerary` property is not set.</p>
+                */
+                _updatePage: function () {
+                    
+                    if (this.visible && !this.user) {
+                        this.$.notify.active = true;    
+                        return;
+                    }
+
+                    this.$.list.generateList();
+                    this.$.list.$.filter.generateFilter();
+                },
+
+                /*
+                 * Get required session data
+                */
+                _syncSession: function () {
+                    this._data = [, {
+                        key: 'Eva_User_Profile',
+                        propertyName: 'user'
+                    }];
+                    this.getSession();
+                },
+
+                _goToDetailsPage: function (e) {
+
+                    if (!e.detail) {
+                        return;
+                    }
+
+                    var tripDetailsUrl = this.desktopSiteBaseUrl + '/tripcart?tripid=' + e.detail + '&token=' + this.authToken;
+                    var win = window.open(url, '_blank');
+
+                    if (!win) {
+                        return;
+                    }
+
+                    win.focus();
+                }
+            });
+        })();
+    </script>
+</dom-module>

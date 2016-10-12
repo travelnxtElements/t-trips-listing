@@ -1,0 +1,18 @@
+{
+  "name": "t-trips-listing",
+  "description": "Polymer component to display trips listing with filters",
+  "main": "t-trips-listing.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.4.0",
+    "t-behavior": "travelnxtelements/t-behavior#^1.0.1",
+    "t-list": "atomelements/t-list#^1.1.25",
+    "t-trip-item": "travelnxtelements/t-trip-item#^1.1.5",
+    "t-sessionstorage": "travelnxtelements/t-sessionstorage#^1.0.3"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  }
+}
