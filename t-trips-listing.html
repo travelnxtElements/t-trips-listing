@@ -60,9 +60,9 @@
             no-results-filtered-message="We could not find any trips for the filters you have applied."
             no-results-filtered-for-search-term-message="We could not find any traveller's name containing 'SEARCHTERM’."
             redirect-link-text="Start planning your trip"
-            data-api="[[apiBaseUrl]]api/ShoppingCart/retrieve/orders/[[user.userId]]?token=[[authToken]]"
-            filter-api="[[apiBaseUrl]]api/ShoppingCart/retrieve/orders/filters?token=?token=[[authToken]]"
-            filterResultsApi="[[apiBaseUrl]]api/ShoppingCart/retrieve/orders/[[user.userId]]?token=[[authToken]]">
+            data-api="[[apiBaseUrl]]api/ShoppingCart/retrieve/orders/[[user.id]]?token=[[authToken]]"
+            filter-api="[[apiBaseUrl]]api/ShoppingCart/retrieve/orders/filters?token=[[authToken]]"
+            filterResultsApi="[[apiBaseUrl]]api/ShoppingCart/retrieve/orders/[[user.id]]?token=[[authToken]]">
             <template>
                 <t-trip-item model="{{item}}"></t-trip-item>
             </template>
@@ -151,7 +151,7 @@
                  * Get required session data
                 */
                 _syncSession: function () {
-                    this._data = [, {
+                    this._data = [{
                         key: 'Eva_User_Profile',
                         propertyName: 'user'
                     }];
@@ -165,7 +165,7 @@
                     }
 
                     var tripDetailsUrl = this.desktopSiteBaseUrl + '/tripcart?tripid=' + e.detail + '&token=' + this.authToken;
-                    var win = window.open(url, '_blank');
+                    var win = window.open(tripDetailsUrl, '_blank');
 
                     if (!win) {
                         return;
