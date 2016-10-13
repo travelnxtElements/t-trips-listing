@@ -1,7 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html" />
 <link rel="import" href="../t-text-container/travel-element-styles.html">
-<link rel="import" href="../t-notify/t-notify.html">
 <link rel="import" href="../t-sessionstorage/t-sessionstorage.html">
 <link rel="import" href="../t-behavior/t-session-behavior.html"/>
 <link rel="import" href="../t-behavior/t-page-behavior.html">
@@ -25,6 +24,7 @@
 <dom-module id="t-trips-listing">
 
     <style include="iron-flex"></style>
+    <style is="custom-style" include="iron-flex-alignment"></style>
     <style include="travel-element-styles">
         :host {
             font-family: var(--header-font-family, --primary-font-family);
@@ -37,17 +37,16 @@
 
         <content select="t-header"></content>
 
-        <t-notify id="notify" message="Logged in user not found!" type="warn"></t-notify>
-
         <t-list
             id="list"
             search-icon="[[searchIcon]]"
             filter-icon="[[filterIcon]]"
+            disable-filter-icon="[[disableFilterIcon]]"
             currency="[[currency]]"
             filter-api-response="result"
             with-filter
             data-call-method="POST"
-            filter-call-method="POST"        
+            filter-call-method="POST"
             filter-response-param="result"
             as="item"
             token-param="bookings"
@@ -62,7 +61,7 @@
             redirect-link-text="Start planning your trip"
             data-api="[[apiBaseUrl]]api/ShoppingCart/retrieve/orders/[[user.id]]?token=[[authToken]]"
             filter-api="[[apiBaseUrl]]api/ShoppingCart/retrieve/orders/filters?token=[[authToken]]"
-            filterResultsApi="[[apiBaseUrl]]api/ShoppingCart/retrieve/orders/[[user.id]]?token=[[authToken]]">
+            filter-results-api="[[apiBaseUrl]]api/ShoppingCart/retrieve/orders/[[user.id]]?token=[[authToken]]">
             <template>
                 <t-trip-item model="{{item}}"></t-trip-item>
             </template>
@@ -91,7 +90,7 @@
                     TravelNxt.Behaviors.SessionBehavior
                 ],
 
-                properties: {                    
+                properties: {
                     user: {
                         type: Object
                     },
@@ -104,18 +103,22 @@
                         type: String
                     },
 
+                    disableFilterIcon: {
+                        type:String
+                    },
+
                     desktopSiteBaseUrl: {
                         type: String
                     }
                 },
 
-                observers:[
+                observers: [
                     '__pageLoad(visible)'
                 ],
-                
+
                 listeners: {
                     'session-get-complete': '_updatePage',
-                    'detail-click' : '_goToDetailsPage'
+                    'detail-click': '_goToDetailsPage'
                 },
 
                 /*
@@ -123,11 +126,9 @@
                 */
                 __pageLoad: function (visible) {
 
-                    if (!visible){
+                    if (!visible) {
                         return;
                     }
-
-                    this.$.notify.active = false;
 
                     this._syncSession();
                 },
@@ -137,9 +138,9 @@
                  * <p>`go-to-search` event is fired if `bookedItinerary` property is not set.</p>
                 */
                 _updatePage: function () {
-                    
+
                     if (this.visible && !this.user) {
-                        this.$.notify.active = true;    
+                        this.fire('unauthenticated-request');
                         return;
                     }
 
