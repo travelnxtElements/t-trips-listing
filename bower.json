@@ -2,7 +2,7 @@
   "name": "t-trips-listing",
   "description": "Polymer component to display trips listing with filters",
   "main": "t-trips-listing.html",
-  "version":"0.0.0",
+  "version": "1.0.0",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
     "t-behavior": "travelnxtelements/t-behavior#^1.0.1",
